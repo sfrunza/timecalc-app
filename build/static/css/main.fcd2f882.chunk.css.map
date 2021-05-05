@@ -1,0 +1,1 @@
+{"version":3,"sources":["webpack://src/index.css"],"names":[],"mappings":"AAAA,KACE,QAAS,CACT,kCAAmC,CACnC,iCACF,CAEA,OAEE,+CACF","file":"main.fcd2f882.chunk.css","sourcesContent":["body {\n  margin: 0;\n  -webkit-font-smoothing: antialiased;\n  -moz-osx-font-smoothing: grayscale;\n}\n\n*,\nhtml {\n  font-family: \"Varela Round\", sans-serif !important;\n}\n"]}
