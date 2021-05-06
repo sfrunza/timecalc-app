@@ -24,6 +24,7 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
     textAlign: "center",
     color: theme.palette.text.secondary,
+    backgroundColor: "#fff",
   },
   picker: {
     width: "100%",
@@ -56,7 +57,7 @@ const App = () => {
   const [travelTimeMinutes, setTravelTimeMinutes] = useState("0");
   const [result, setResult] = useState();
   const [rounded, setRounded] = useState();
-  const [rate, setRate] = useState(120);
+  const [rate, setRate] = useState(160);
   const [labourTime, setLabourTime] = useState();
   const [trav, setTrav] = useState();
 
@@ -70,6 +71,8 @@ const App = () => {
     setTravelTimeMinutes("0");
     setResult(null);
     setRounded(null);
+    setLabourTime(null);
+    setTrav(null);
     setRate(120);
   };
 
@@ -83,7 +86,6 @@ const App = () => {
   const calculateTime = (start, finish, travelTimeHours, travelTimeMinutes) => {
     let ary1 = start.split(":");
     let ary2 = finish.split(":");
-    // let ary3 = travel.split(":");
     let minsdiff =
       parseInt(travelTimeHours, 10) * 60 +
       parseInt(travelTimeMinutes, 10) +
@@ -101,13 +103,15 @@ const App = () => {
     setLabourTime(
       String(100 + Math.floor(labour / 60)).substr(1) +
         ":" +
-        String(100 + (labour % 60)).substr(1)
+        String(100 + Math.floor(labour % 60)).substr(1)
     );
+
     setTrav(
       String(100 + Math.floor(travel / 60)).substr(1) +
         ":" +
         String(100 + (travel % 60)).substr(1)
     );
+
     roundTime(
       String(100 + Math.floor(minsdiff / 60)).substr(1) +
         ":" +
@@ -144,10 +148,8 @@ const App = () => {
     }).format(number);
   };
 
-  console.log(value);
-
   return (
-    <Container fixed className={classes.root}>
+    <Container fixed className={classes.root} maxWidth="sm">
       <Paper className={classes.paper}>
         <Grid container spacing={3} justify="center" alignItems="center">
           <Grid item xs={12}>
@@ -162,25 +164,6 @@ const App = () => {
               value={value}
               clockIcon={null}
               disableClock
-            />
-          </Grid>
-          <Grid item xs={2}>
-            <Typography color="textPrimary">Rate: </Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <TextField
-              value={rate}
-              inputProps={{
-                maxLength: 3,
-                inputMode: "numeric",
-              }}
-              onInput={(e) => onlyNumbers(e)}
-              label=""
-              placeholder="160"
-              variant="outlined"
-              size="small"
-              name="rate"
-              onChange={(e) => setRate(e.target.value)}
             />
           </Grid>
           <Grid item xs={12}>
@@ -239,14 +222,18 @@ const App = () => {
               Calculate
             </ColorButton>
           </Grid>
-          <Grid item xs={12}>
-            <Typography color="textPrimary">
-              Labour Time: {labourTime}
-            </Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography color="textPrimary">Travel Time: {trav}</Typography>
-          </Grid>
+          {labourTime && (
+            <Grid item xs={12}>
+              <Typography color="textPrimary">
+                Labour Time: {labourTime}
+              </Typography>
+            </Grid>
+          )}
+          {trav && (
+            <Grid item xs={12}>
+              <Typography color="textPrimary">Travel Time: {trav}</Typography>
+            </Grid>
+          )}
           {result && (
             <Grid item xs={5}>
               <Typography color="textPrimary">Total time</Typography>
@@ -262,12 +249,42 @@ const App = () => {
             </Grid>
           )}
           {rounded && (
-            <Grid item xs={12}>
-              <Typography color="textPrimary">Total Amount</Typography>
-              <Typography>
-                {timeStringToFloat(rounded)} * {rate} ={" "}
-                {formatPrice(timeStringToFloat(rounded) * rate)}
-              </Typography>
+            <Grid container spacing={3} justify="center" alignItems="center">
+              <Grid item xs={12}>
+                <Typography color="textPrimary">Total Amount</Typography>
+              </Grid>
+              <Grid item xs={2}>
+                <Typography color="textPrimary">
+                  {timeStringToFloat(rounded)}
+                </Typography>
+              </Grid>
+              <Grid item xs={1}>
+                <Typography color="textPrimary">*</Typography>
+              </Grid>
+              <Grid item xs={3}>
+                <TextField
+                  value={rate}
+                  inputProps={{
+                    maxLength: 3,
+                    inputMode: "numeric",
+                  }}
+                  onInput={(e) => onlyNumbers(e)}
+                  label="rate"
+                  placeholder="160"
+                  variant="outlined"
+                  size="small"
+                  name="rate"
+                  onChange={(e) => setRate(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={1}>
+                <Typography color="textPrimary">=</Typography>
+              </Grid>
+              <Grid item xs={3}>
+                <Typography color="textPrimary">
+                  {formatPrice(timeStringToFloat(rounded) * rate)}
+                </Typography>
+              </Grid>
             </Grid>
           )}
           {result && (
