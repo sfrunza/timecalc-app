@@ -154,7 +154,7 @@ const App = () => {
         <Grid container spacing={3} justify="center" alignItems="center">
           <Grid item xs={12}>
             <Typography variant="h5" color="textPrimary">
-              Time Duration Calculator
+              Time Duration Calculator.
             </Typography>
           </Grid>
           <Grid item xs={12}>
