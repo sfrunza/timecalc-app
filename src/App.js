@@ -9,6 +9,7 @@ import {
   withStyles,
   Divider,
   Box,
+  Badge,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
@@ -25,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
   },
   paper: {
     padding: theme.spacing(2),
-    textAlign: "center",
+    // textAlign: "center",
     color: theme.palette.text.secondary,
     backgroundColor: "#fff",
   },
@@ -43,9 +44,20 @@ const useStyles = makeStyles((theme) => ({
   discountInput: {
     width: "10%",
     "& > div input": {
-      height: 10,
-      padding: "7px 5px",
+      padding: "1px 5px",
     },
+  },
+  textCenter: {
+    textAlign: "center",
+    paddingBottom: 16,
+  },
+  divider: {
+    margin: theme.spacing(2, 0),
+  },
+  badge: {
+    right: 21,
+    top: -5,
+    fontSize: 8,
   },
 }));
 
@@ -77,6 +89,7 @@ const App = () => {
   const [labourTime, setLabourTime] = useState();
   const [trav, setTrav] = useState();
   const [offTime, setOffTime] = useState();
+  const [submit, setSubmit] = useState(false);
 
   const onlyNumbers = (e) => {
     e.target.value = e.target.value.replace(/[^0-9]/g, "");
@@ -94,6 +107,7 @@ const App = () => {
     setTrav(null);
     setRate(120);
     setOffTime(null);
+    setSubmit(false);
   };
 
   const timeStringToFloat = (time) => {
@@ -183,13 +197,26 @@ const App = () => {
     }).format(number);
   };
 
+  let color = "black";
+  if (travelTimeHours === "0" && travelTimeMinutes === "0") {
+    color = "red";
+  } else {
+    color = "black";
+  }
+
   return (
     <Container className={classes.root} maxWidth="sm">
       <Paper className={classes.paper}>
-        <Grid container spacing={2} justify="center" alignItems="center">
+        <Grid
+          container
+          spacing={2}
+          justify="center"
+          alignItems="center"
+          className={classes.textCenter}
+        >
           <Grid item xs={12}>
             <Typography variant="h5" color="textPrimary">
-              Time Duration Calculator.
+              Time Duration Calculator
             </Typography>
           </Grid>
           <Grid item xs={12}>
@@ -202,7 +229,13 @@ const App = () => {
             />
           </Grid>
           <Grid item xs={12}>
-            <Typography color="textPrimary">Travel time</Typography>
+            <Typography
+              style={{
+                color: `${color}`,
+              }}
+            >
+              Travel time
+            </Typography>
           </Grid>
           <Grid item xs={3}>
             <TextField
@@ -283,7 +316,8 @@ const App = () => {
                 !travelTimeMinutes ||
                 !value ||
                 !timeOffHours ||
-                !timeOffMinutes
+                !timeOffMinutes ||
+                (travelTimeHours === "0" && travelTimeMinutes === "0")
                   ? true
                   : false
               }
@@ -296,143 +330,214 @@ const App = () => {
                   timeOffHours,
                   timeOffMinutes
                 );
+                setSubmit(true);
               }}
             >
               Calculate
             </ColorButton>
           </Grid>
-          {labourTime && (
+        </Grid>
+        {submit && <Divider className={classes.divider} />}
+        {submit && (
+          <Grid
+            container
+            spacing={2}
+            justify="center"
+            alignItems="center"
+            direction="row"
+          >
+            {labourTime && (
+              <>
+                <Grid item xs={6}>
+                  <Typography color="textPrimary">Labour Time:</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography color="textSecondary">{labourTime}</Typography>
+                </Grid>
+              </>
+            )}
+
+            {trav && (
+              <>
+                <Grid item xs={6}>
+                  <Typography color="textPrimary">Travel Time:</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography color="textSecondary">{trav}</Typography>
+                </Grid>
+              </>
+            )}
+
+            {offTime && (
+              <>
+                <Grid item xs={6}>
+                  <Typography color="textPrimary">Time off: </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography color="textSecondary">{offTime}</Typography>
+                </Grid>
+              </>
+            )}
+            {result && (
+              <>
+                <Grid item xs={3}>
+                  <Typography color="textPrimary">Total:</Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <Box display="flex">
+                    <Badge
+                      classes={{ anchorOriginTopRightRectangle: classes.badge }}
+                      color="default"
+                      badgeContent={<p>labour</p>}
+                    >
+                      <Typography>{labourTime}</Typography>
+                    </Badge>
+                    <span style={{ margin: "0px 3px" }}>+</span>
+                    <Badge
+                      classes={{ anchorOriginTopRightRectangle: classes.badge }}
+                      color="default"
+                      badgeContent={<p>travel</p>}
+                    >
+                      <Typography>{trav}</Typography>
+                    </Badge>
+                    {offTime !== "00:00" ? (
+                      <Badge
+                        classes={{
+                          anchorOriginTopRightRectangle: classes.badge,
+                        }}
+                        color="default"
+                        badgeContent={<p>off</p>}
+                      >
+                        <Typography>
+                          <span style={{ margin: "0px 3px" }}>-</span>
+                          {offTime}
+                        </Typography>
+                      </Badge>
+                    ) : null}
+
+                    <Typography>
+                      <span style={{ margin: "0px 3px" }}>=</span>
+                      {result}
+                    </Typography>
+                  </Box>
+                </Grid>
+              </>
+            )}
+            {result && (
+              <>
+                <Grid item xs={6}>
+                  <Typography style={{ color: green[500] }}>
+                    Time rounded:
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography>{rounded}</Typography>
+                </Grid>
+              </>
+            )}
+          </Grid>
+        )}
+        {rounded && <Divider className={classes.divider} />}
+        {rounded && (
+          <Grid
+            container
+            spacing={3}
+            justify="center"
+            alignItems="center"
+            className={classes.textCenter}
+          >
             <Grid item xs={12}>
-              <Typography color="textPrimary">
-                Labour Time: {labourTime}
+              <Typography color="textPrimary">Total Amount</Typography>
+            </Grid>
+            <Grid item xs={2}>
+              <Typography color="textSecondary">
+                {timeStringToFloat(rounded)}
               </Typography>
             </Grid>
-          )}
-          {trav && (
-            <Grid item xs={12}>
-              <Typography color="textPrimary">Travel Time: {trav}</Typography>
+            <Grid item xs={1}>
+              <Typography color="textSecondary">*</Typography>
             </Grid>
-          )}
-          {offTime && (
-            <Grid item xs={12}>
-              <Typography color="textPrimary">Time off: {offTime}</Typography>
+            <Grid item xs={3}>
+              <TextField
+                value={rate}
+                inputProps={{
+                  maxLength: 3,
+                  inputMode: "numeric",
+                }}
+                onInput={(e) => onlyNumbers(e)}
+                label="rate"
+                placeholder="160"
+                variant="outlined"
+                size="small"
+                name="rate"
+                onChange={(e) => setRate(e.target.value)}
+              />
             </Grid>
-          )}
-          {result && (
-            <Grid item xs={5}>
-              <Typography color="textPrimary">Total time</Typography>
-              <Box>
-                <Typography>
-                  {labourTime} <span>+</span>
-                </Typography>
-                <Typography>
-                  {trav} <span>-</span>
-                </Typography>
-                <Typography>
-                  {offTime}
-                  <span style={{ visibility: "hidden" }}>=</span>
-                </Typography>
-                <Divider />
-                <Typography>
-                  {result}
-                  <span style={{ visibility: "hidden" }}>h</span>
-                </Typography>
-              </Box>
+            <Grid item xs={1}>
+              <Typography color="textSecondary">=</Typography>
             </Grid>
-          )}
-          {result && (
-            <Grid item xs={5}>
-              <Typography style={{ color: green[500] }}>
-                Total rounded
+            <Grid item xs={4}>
+              <Typography color="textSecondary">
+                {formatPrice(timeStringToFloat(rounded) * rate)}
               </Typography>
-              <Typography>{rounded}</Typography>
             </Grid>
-          )}
-          {rounded && (
-            <Grid container spacing={3} justify="center" alignItems="center">
-              <Grid item xs={12}>
-                <Typography color="textPrimary">Total Amount</Typography>
-              </Grid>
-              <Grid item xs={2}>
-                <Typography color="textPrimary">
-                  {timeStringToFloat(rounded)}
-                </Typography>
-              </Grid>
-              <Grid item xs={1}>
-                <Typography color="textPrimary">*</Typography>
-              </Grid>
-              <Grid item xs={3}>
+            <Grid item xs={12}>
+              <Divider />
+            </Grid>
+            <Grid item xs={12}>
+              <Typography color="textPrimary">Extra</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography
+                color="textPrimary"
+                variant="h6"
+                style={{ fontSize: 14 }}
+              >
+                {formatPrice(timeStringToFloat(rounded) * rate)} -{" "}
                 <TextField
-                  value={rate}
+                  className={classes.discountInput}
+                  value={discount}
                   inputProps={{
-                    maxLength: 3,
+                    maxLength: 2,
                     inputMode: "numeric",
                   }}
                   onInput={(e) => onlyNumbers(e)}
-                  label="rate"
-                  placeholder="160"
+                  placeholder="0"
                   variant="outlined"
                   size="small"
-                  name="rate"
-                  onChange={(e) => setRate(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={1}>
-                <Typography color="textPrimary">=</Typography>
-              </Grid>
-              <Grid item xs={4}>
-                <Typography color="textPrimary">
-                  {formatPrice(timeStringToFloat(rounded) * rate)}
-                </Typography>
-              </Grid>
-              <Grid item xs={12} style={{ marginBottom: "16px" }}>
-                <Typography color="textPrimary">
-                  {formatPrice(timeStringToFloat(rounded) * rate)} -{" "}
-                  <TextField
-                    className={classes.discountInput}
-                    value={discount}
-                    inputProps={{
-                      maxLength: 2,
-                      inputMode: "numeric",
-                    }}
-                    onInput={(e) => onlyNumbers(e)}
-                    placeholder="0"
-                    variant="outlined"
-                    size="small"
-                    name="discount"
-                    onChange={(e) => setDiscount(e.target.value)}
-                  />{" "}
-                  % (
-                  <span className={classes.secondary}>
-                    {formatPrice(
+                  name="discount"
+                  onChange={(e) => setDiscount(e.target.value)}
+                />{" "}
+                % (
+                <span className={classes.secondary}>
+                  {formatPrice(
+                    timeStringToFloat(rounded) * rate * (discount * 0.01)
+                  )}
+                </span>
+                ) ={" "}
+                <span className="error">
+                  {" "}
+                  {formatPrice(
+                    timeStringToFloat(rounded) * rate -
                       timeStringToFloat(rounded) * rate * (discount * 0.01)
-                    )}
-                  </span>
-                  ) ={" "}
-                  <span className="error">
-                    {" "}
-                    {formatPrice(
-                      timeStringToFloat(rounded) * rate -
-                        timeStringToFloat(rounded) * rate * (discount * 0.01)
-                    )}
-                  </span>
-                </Typography>
-              </Grid>
+                  )}
+                </span>
+              </Typography>
             </Grid>
-          )}
-          {result && (
-            <Grid item xs={12} style={{ marginTop: "2rem" }}>
-              <Button
-                color="secondary"
-                size="small"
-                variant="contained"
-                onClick={() => resetCalculator()}
-              >
-                Reset
-              </Button>
-            </Grid>
-          )}
-        </Grid>
+          </Grid>
+        )}
+        {result && (
+          <Grid item xs={12} style={{ marginTop: "2rem" }}>
+            <Button
+              color="secondary"
+              size="small"
+              variant="outlined"
+              onClick={() => resetCalculator()}
+            >
+              Reset
+            </Button>
+          </Grid>
+        )}
       </Paper>
     </Container>
   );
