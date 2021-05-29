@@ -10,6 +10,7 @@ import {
   Divider,
   Box,
   Badge,
+  InputAdornment,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { green } from "@material-ui/core/colors";
@@ -17,34 +18,36 @@ import TimeRangePicker from "@wojtekmaj/react-timerange-picker";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    // height: "100%",
+    minHeight: "80vh",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     overflow: "hidden",
     padding: theme.spacing(4, 2),
+    marginBottom: "30%",
   },
   paper: {
     padding: theme.spacing(2),
+    // paddingBottom: theme.spacing(14),
     // textAlign: "center",
     color: theme.palette.text.secondary,
-    backgroundColor: "#fff",
+    // backgroundColor: "#fafafa",
   },
   picker: {
     width: "100%",
     "& div": {
-      borderRadius: 4,
+      borderRadius: 8,
       padding: 6,
-      borderColor: "rgba(0, 0, 0, 0.23)",
+      borderColor: "rgb(213 213 213)",
     },
   },
   secondary: {
     color: "#757575",
   },
   discountInput: {
-    width: "10%",
+    width: "18%",
     "& > div input": {
-      padding: "1px 5px",
+      padding: "6px 0px",
     },
   },
   textCenter: {
@@ -79,13 +82,13 @@ const App = () => {
   const classes = useStyles();
   const [value, onChange] = useState(["8:00", `${h}:${m}`]);
   const [travelTimeHours, setTravelTimeHours] = useState("0");
-  const [travelTimeMinutes, setTravelTimeMinutes] = useState("0");
+  const [travelTimeMinutes, setTravelTimeMinutes] = useState("45");
   const [timeOffHours, setTimeOffHours] = useState("0");
   const [timeOffMinutes, setTimeOffMinutes] = useState("0");
   const [result, setResult] = useState();
   const [rounded, setRounded] = useState();
   const [rate, setRate] = useState(160);
-  const [discount, setDiscount] = useState(0);
+  const [discount, setDiscount] = useState(5);
   const [labourTime, setLabourTime] = useState();
   const [trav, setTrav] = useState();
   const [offTime, setOffTime] = useState();
@@ -98,14 +101,14 @@ const App = () => {
   const resetCalculator = () => {
     onChange(["8:00", `${h}:${m}`]);
     setTravelTimeHours("0");
-    setTravelTimeMinutes("0");
+    setTravelTimeMinutes("45");
     setTimeOffHours("0");
     setTimeOffMinutes("0");
     setResult(null);
     setRounded(null);
     setLabourTime(null);
     setTrav(null);
-    setRate(120);
+    setRate(rate);
     setOffTime(null);
     setSubmit(false);
   };
@@ -206,7 +209,12 @@ const App = () => {
 
   return (
     <Container className={classes.root} maxWidth="sm">
-      <Paper className={classes.paper}>
+      <Paper className={classes.paper} elevation={5}>
+        <Box mb={4} display="flex" justifyContent="center">
+          <Typography variant="h5" color="textPrimary">
+            Time Duration Calculator
+          </Typography>
+        </Box>
         <Grid
           container
           spacing={2}
@@ -215,17 +223,13 @@ const App = () => {
           className={classes.textCenter}
         >
           <Grid item xs={12}>
-            <Typography variant="h5" color="textPrimary">
-              Time Duration Calculator
-            </Typography>
-          </Grid>
-          <Grid item xs={12}>
             <TimeRangePicker
               className={classes.picker}
               onChange={onChange}
               value={value}
               clockIcon={null}
               disableClock
+              disabled={submit}
             />
           </Grid>
           <Grid item xs={12}>
@@ -249,7 +253,10 @@ const App = () => {
               variant="outlined"
               size="small"
               name="travelTimeHours"
-              onChange={(e) => setTravelTimeHours(e.target.value)}
+              onChange={(e) => {
+                setSubmit(false);
+                setTravelTimeHours(e.target.value);
+              }}
             />
           </Grid>
           <Grid item xs={1}>
@@ -267,7 +274,10 @@ const App = () => {
               variant="outlined"
               size="small"
               name="travelTimeMinutes"
-              onChange={(e) => setTravelTimeMinutes(e.target.value)}
+              onChange={(e) => {
+                setSubmit(false);
+                setTravelTimeMinutes(e.target.value);
+              }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -285,7 +295,10 @@ const App = () => {
               variant="outlined"
               size="small"
               name="timeOffHours"
-              onChange={(e) => setTimeOffHours(e.target.value)}
+              onChange={(e) => {
+                setSubmit(false);
+                setTimeOffHours(e.target.value);
+              }}
             />
           </Grid>
           <Grid item xs={1}>
@@ -303,38 +316,60 @@ const App = () => {
               variant="outlined"
               size="small"
               name="timeOffMinutes"
-              onChange={(e) => setTimeOffMinutes(e.target.value)}
+              onChange={(e) => {
+                setSubmit(false);
+                setTimeOffMinutes(e.target.value);
+              }}
             />
           </Grid>
-          <Grid item xs={12}>
-            <ColorButton
-              color="primary"
-              size="small"
-              variant="contained"
-              disabled={
-                !travelTimeHours ||
-                !travelTimeMinutes ||
-                !value ||
-                !timeOffHours ||
-                !timeOffMinutes ||
-                (travelTimeHours === "0" && travelTimeMinutes === "0")
-                  ? true
-                  : false
-              }
-              onClick={() => {
-                calculateTime(
-                  value[0],
-                  value[1],
-                  travelTimeHours,
-                  travelTimeMinutes,
-                  timeOffHours,
-                  timeOffMinutes
-                );
-                setSubmit(true);
-              }}
-            >
-              Calculate
-            </ColorButton>
+
+          <Grid
+            item
+            xs={12}
+            style={{
+              position: "fixed",
+              bottom: "7%",
+            }}
+          >
+            {!submit ? (
+              <ColorButton
+                color="primary"
+                size="large"
+                variant="contained"
+                disabled={
+                  !travelTimeHours ||
+                  !travelTimeMinutes ||
+                  !value ||
+                  !timeOffHours ||
+                  !timeOffMinutes ||
+                  (travelTimeHours === "0" && travelTimeMinutes === "0")
+                    ? true
+                    : false
+                }
+                onClick={() => {
+                  calculateTime(
+                    value[0],
+                    value[1],
+                    travelTimeHours,
+                    travelTimeMinutes,
+                    timeOffHours,
+                    timeOffMinutes
+                  );
+                  setSubmit(true);
+                }}
+              >
+                Calculate
+              </ColorButton>
+            ) : (
+              <Button
+                color="secondary"
+                size="large"
+                variant="contained"
+                onClick={() => resetCalculator()}
+              >
+                Reset
+              </Button>
+            )}
           </Grid>
         </Grid>
         {submit && <Divider className={classes.divider} />}
@@ -437,8 +472,8 @@ const App = () => {
             )}
           </Grid>
         )}
-        {rounded && <Divider className={classes.divider} />}
-        {rounded && (
+        {submit && <Divider className={classes.divider} />}
+        {submit && (
           <Grid
             container
             spacing={3}
@@ -450,12 +485,12 @@ const App = () => {
               <Typography color="textPrimary">Total Amount</Typography>
             </Grid>
             <Grid item xs={2}>
-              <Typography color="textSecondary">
+              <Typography color="textPrimary">
                 {timeStringToFloat(rounded)}
               </Typography>
             </Grid>
             <Grid item xs={1}>
-              <Typography color="textSecondary">*</Typography>
+              <Typography color="textSecondary">X</Typography>
             </Grid>
             <Grid item xs={3}>
               <TextField
@@ -466,7 +501,6 @@ const App = () => {
                 }}
                 onInput={(e) => onlyNumbers(e)}
                 label="rate"
-                placeholder="160"
                 variant="outlined"
                 size="small"
                 name="rate"
@@ -477,7 +511,7 @@ const App = () => {
               <Typography color="textSecondary">=</Typography>
             </Grid>
             <Grid item xs={4}>
-              <Typography color="textSecondary">
+              <Typography color="textPrimary">
                 {formatPrice(timeStringToFloat(rounded) * rate)}
               </Typography>
             </Grid>
@@ -491,9 +525,17 @@ const App = () => {
               <Typography
                 color="textPrimary"
                 variant="h6"
-                style={{ fontSize: 14 }}
+                style={{
+                  fontSize: 14,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
               >
-                {formatPrice(timeStringToFloat(rounded) * rate)} -{" "}
+                <Typography>
+                  {formatPrice(timeStringToFloat(rounded) * rate)}
+                </Typography>
+                <Typography>-</Typography>
                 <TextField
                   className={classes.discountInput}
                   value={discount}
@@ -502,13 +544,17 @@ const App = () => {
                     inputMode: "numeric",
                   }}
                   onInput={(e) => onlyNumbers(e)}
-                  placeholder="0"
                   variant="outlined"
                   size="small"
                   name="discount"
                   onChange={(e) => setDiscount(e.target.value)}
-                />{" "}
-                % (
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="start">%</InputAdornment>
+                    ),
+                  }}
+                />
+                (
                 <span className={classes.secondary}>
                   {formatPrice(
                     timeStringToFloat(rounded) * rate * (discount * 0.01)
@@ -524,18 +570,6 @@ const App = () => {
                 </span>
               </Typography>
             </Grid>
-          </Grid>
-        )}
-        {result && (
-          <Grid item xs={12} style={{ marginTop: "2rem" }}>
-            <Button
-              color="secondary"
-              size="small"
-              variant="outlined"
-              onClick={() => resetCalculator()}
-            >
-              Reset
-            </Button>
           </Grid>
         )}
       </Paper>
